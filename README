@@ -1,0 +1,97 @@
+Health
+======
+
+Health will setup a standardized health_check URL on your application.  System Administrators can 
+then use this URL to look for an HTTP response of 200 and the response content of 'SERVERUP'.
+
+Example
+=======
+
+To add the health check to your application you can include this plugin and simply include it in your 
+application controller.
+
+  ApplicationController < ActionController::Base
+    include Health
+  end
+
+Once you've done this you can see if the application is running by navigating to 
+
+  http://localhost:3000/health_check
+
+HINT: Health does not care what controller it is mixed in with.
+
+Database Check
+==============
+
+By default, health will also run a basic sql query[1] on your database and check the results.  If there is
+an error it will return content of 'DBDOWN'.  NOTE, if your database is down or the credentials are not 
+properly setup, Rails will throw a 500 error before the health_check action is ever run.
+
+Some rails applications do not use a databases and are not backed ActiveRecord models.  To turn of the
+database check you configure health_check with a option to turn it off:
+
+  ApplicationController < ActionController::Base
+    include Health
+    health_check :with_db => false
+  end
+
+[1] the query it runs is 'select 1' on your ActiveRecord::Base.connection.
+
+Manual Checks
+=============
+
+You can also supply any additional checking you'd like to have Health to perform.  This return value +must+ 
+be true if successful, otherwise it will return the result after the content 'PROCDOWN'.  You can specify
+multiple checks and Health will return once a check fails and will not process any other checks.  
+
+I suggest that if a process fails to return a descriptive reason as the result so you can see why/which check
+failed. (ie. PROCDOWN no donut)
+
+You can specify a Proc, block, or a Symbol representing the method name on the controller in which Health 
+was included.
+
+For +blocks+, the controller argument is optional:
+
+  ApplicationController < ActionController::Base
+    include Health
+    health_check do |controller|
+      controller.has_donut? || "no donut"
+    end
+  end
+
+For +Procs+, just past them as a list of arguments, they are run in context of the controller:
+
+  ApplicationController < ActionController::Base
+    include Health
+    health_check lambda {  donut? || "no donut" }, lambda { donuts.size < 12 || "less than a dozen donuts" }
+  end
+  
+For +Symbols+, make sure they are defined in your controller:
+
+  ApplicationController < ActionController::Base
+    include Health
+    health_check :check_donut, :check_quantity
+
+    def check_donut
+      donut? || "no donut"
+    end
+    
+    def check_quantity
+     donuts.size < 12 || "less than a dozen donuts"
+    end
+  end
+
+You may mix and match all three types, the block will be run last:
+
+  ApplicationController < ActionController::Base
+    include Health
+    health_check :check_donut, lambda { donuts.size < 12 || "less than a dozen donuts" }, :with_db => false do |c|
+      c.homer.blank? || "watch out for homer"
+    end
+    
+    def check_donut
+      donut? || "no donut"
+    end
+  end
+
+Copyright (c) 2008 Los Angeles Times, released under the MIT license
