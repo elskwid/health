@@ -23,7 +23,7 @@ module Health
     # check db first
     if self.check_db_health
       result = ActiveRecord::Base.connection.execute("select 1") rescue nil
-      return render :text => 'DBDOWN' unless result and result.fetch_hash == {"1" => "1"}
+      return render(:text => 'DBDOWN') unless result and result.fetch_hash == {"1" => "1"}
     end
     
     # then any supplied checks
@@ -34,7 +34,7 @@ module Health
                  when check.respond_to?(:call): check.call(self) rescue raise(ActionController::ActionControllerError, 'Cannot yield from a Proc type check.')
                  else raise(ActionController::ActionControllerError, 'A check must be a Symbol, Proc, or Method')
                  end
-        return render :text => "PROCDOWN #{status}" unless status == true
+        return render(:text => "PROCDOWN #{status}") unless status == true
       end 
     end
      
