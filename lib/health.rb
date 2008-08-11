@@ -2,8 +2,12 @@ module Health
   def self.included(base)
     base.extend(ClassMethods)
     base.check_health :with_db => true    
-    ActionController::Routing::Routes.add_named_route 'check_health', 'check_health', 
-      :controller => base.controller_name, :action => 'check_health_action'
+    
+    # add the named route if there isn't already one defined
+    unless path = ActionController::Routing::Routes.recognize_path("/check_health") rescue nil
+      ActionController::Routing::Routes.add_named_route 'check_health', 'check_health', 
+        :controller => base.controller_name, :action => 'check_health_action' 
+    end
   end
 
   module ClassMethods
