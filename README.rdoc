@@ -1,11 +1,9 @@
-Health
-======
+= Health
 
 Health will setup a standardized health_check URL on your application.  System Administrators can 
 then use this URL to look for an HTTP response of 200 and the response content of 'SERVERUP'.
 
-Example
-=======
+== Example
 
 To add the health check to your application you can include this plugin and simply include it in your 
 application controller.
@@ -18,10 +16,9 @@ Once you've done this you can see if the application is running by navigating to
 
   http://localhost:3000/health_check
 
-HINT: Health does not care what controller it is mixed in with.
+_HINT_: Health does not care what controller it is mixed in with.
 
-Database Check
-==============
+== Database Check
 
 By default, health will also run a basic sql query[1] on your database and check the results.  If there is
 an error it will return content of 'DBDOWN'.  NOTE, if your database is down or the credentials are not 
@@ -37,8 +34,7 @@ database check you configure health_check with a option to turn it off:
 
 [1] the query it runs is 'select 1' on your ActiveRecord::Base.connection.
 
-Manual Checks
-=============
+== Manual Checks
 
 You can also supply any additional checking you'd like to have Health to perform.  This return value +must+ 
 be true if successful, otherwise it will return the result after the content 'PROCDOWN'.  You can specify
