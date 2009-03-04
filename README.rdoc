@@ -1,6 +1,6 @@
 = Health
 
-Health will setup a standardized health_check URL on your application.  System Administrators can 
+Health will setup a standardized check_health URL on your application.  System Administrators can 
 then use this URL to look for an HTTP response of 200 and the response content of 'SERVERUP'.
 
 == Example
@@ -14,7 +14,7 @@ application controller.
 
 Once you've done this you can see if the application is running by navigating to 
 
-  http://localhost:3000/health_check
+  http://localhost:3000/check_health
 
 _HINT_: Health does not care what controller it is mixed in with.
 
@@ -22,14 +22,14 @@ _HINT_: Health does not care what controller it is mixed in with.
 
 By default, health will also run a basic sql query[1] on your database and check the results.  If there is
 an error it will return content of 'DBDOWN'.  NOTE, if your database is down or the credentials are not 
-properly setup, Rails will throw a 500 error before the health_check action is ever run.
+properly setup, Rails will throw a 500 error before the check_health action is ever run.
 
 Some rails applications do not use a databases and are not backed ActiveRecord models.  To turn of the
-database check you configure health_check with a option to turn it off:
+database check you configure check_health with a option to turn it off:
 
   ApplicationController < ActionController::Base
     include Health
-    health_check :with_db => false
+    check_health :with_db => false
   end
 
 [1] the query it runs is 'select 1' on your ActiveRecord::Base.connection.
@@ -50,7 +50,7 @@ For +blocks+, the controller argument is optional:
 
   ApplicationController < ActionController::Base
     include Health
-    health_check do |controller|
+    check_health do |controller|
       controller.has_donut? || "no donut"
     end
   end
@@ -59,14 +59,14 @@ For +Procs+, just past them as a list of arguments, they are run in context of t
 
   ApplicationController < ActionController::Base
     include Health
-    health_check lambda {  donut? || "no donut" }, lambda { donuts.size < 12 || "less than a dozen donuts" }
+    check_health lambda {  donut? || "no donut" }, lambda { donuts.size < 12 || "less than a dozen donuts" }
   end
   
 For +Symbols+, make sure they are defined in your controller:
 
   ApplicationController < ActionController::Base
     include Health
-    health_check :check_donut, :check_quantity
+    check_health :check_donut, :check_quantity
 
     def check_donut
       donut? || "no donut"
@@ -81,7 +81,7 @@ You may mix and match all three types, the block will be run last:
 
   ApplicationController < ActionController::Base
     include Health
-    health_check :check_donut, lambda { donuts.size < 12 || "less than a dozen donuts" }, :with_db => false do |c|
+    check_health :check_donut, lambda { donuts.size < 12 || "less than a dozen donuts" }, :with_db => false do |c|
       c.homer.blank? || "watch out for homer"
     end
     
