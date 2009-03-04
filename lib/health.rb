@@ -26,8 +26,8 @@ module Health
   def check_health_action
     # check db first
     if self.check_db_health
-      result = ActiveRecord::Base.connection.execute("select 1") rescue nil
-      return render(:text => 'DBDOWN') unless result and result.fetch_hash == {"1" => "1"}
+      result = ActiveRecord::Base.connection.select_rows("select 1") rescue nil
+      return render(:text => 'DBDOWN') unless result and result == [["1"]]
     end
     
     # then any supplied checks
