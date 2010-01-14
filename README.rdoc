@@ -18,6 +18,15 @@ Once you've done this you can see if the application is running by navigating to
 
 _HINT_: Health does not care what controller it is mixed in with.
 
+== Alternate Success Response
+
+By default, health returns HTTP 200 with content of 'SERVERUP'. To change the success content you configure check_health with an option:
+
+  ApplicationController < ActionController::Base
+    include Health
+    check_health :success_message => 'ALL GOOD!'
+  end
+
 == Database Check
 
 By default, health will also run a basic sql query[1] on your database and check the results.  If there is

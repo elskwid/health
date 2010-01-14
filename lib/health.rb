@@ -15,6 +15,8 @@ module Health
       options = args.extract_options!
       class_inheritable_accessor :check_db_health unless defined?(self.check_db_health)
       self.check_db_health = (options[:with_db].nil? ? true : options[:with_db])
+      class_inheritable_accessor :check_health_success_message unless defined?(self.check_health_success_message)
+      self.check_health_success_message = (options[:success_message].nil? ? 'SERVERUP' : options[:success_message])
       class_inheritable_array :checks_for_health
 
       checks = args.flatten
@@ -43,6 +45,6 @@ module Health
     end
      
     # all good
-    render :text => 'SERVERUP'      
+    render :text => self.check_health_success_message
   end
 end

@@ -22,7 +22,7 @@ class HealthTest < Test::Unit::TestCase
     rs.clear!    
   end
   
-  INHERITABLE_METHODS = %w(check_db_health check_db_health= checks_for_health checks_for_health=)
+  INHERITABLE_METHODS = %w(check_db_health check_db_health= checks_for_health checks_for_health= check_health_success_message check_health_success_message=)
   def test_should_include_methods_with_defaults
     assert [], @controller.methods.grep(/check/)
 
@@ -143,6 +143,14 @@ class HealthTest < Test::Unit::TestCase
     assert_equal "test2", @controller.checks_for_health.last.call
   end
 
+  def test_check_health_action_with_alternate_success_message
+    @controller.instance_eval do
+       include Health 
+       check_health :success_message => 'ALLOK', :with_db => false
+    end
+    assert_equal 'ALLOK', @controller.new.check_health_action
+  end
+  
   def test_check_health_action_no_db
     @controller.instance_eval do
        include Health 
@@ -228,8 +236,8 @@ class HealthTest < Test::Unit::TestCase
   end
 
   def assert_check_health(controller)
-    assert_sets_equal INHERITABLE_METHODS + %w(check_health),        controller.methods.grep(/check/)
-    assert_sets_equal INHERITABLE_METHODS + %w(check_health_action), controller.new.methods.grep(/check/)
+    assert_sets_equal INHERITABLE_METHODS + %w(check_health),        controller.methods.grep(/checks?_/)
+    assert_sets_equal INHERITABLE_METHODS + %w(check_health_action), controller.new.methods.grep(/checks?_/)
 
     assert controller.check_db_health
     assert_equal [], controller.checks_for_health
